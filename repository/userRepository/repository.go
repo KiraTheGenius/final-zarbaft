@@ -74,7 +74,11 @@ func getDbConnection() *gorm.DB {
 	db.LogMode(true)
 
 	// Migrate the User model to the database (if necessary)
-	db.AutoMigrate(&models.User{})
+	db.AutoMigrate(&models.Collection{}, &models.Carpet{}, &models.CarpetColor{}, &models.CarpetMedia{})
+	db.Model(&models.Carpet{}).AddForeignKey("collection_id", "collections(id)", "RESTRICT", "RESTRICT")
+	db.Model(&models.CarpetColor{}).AddForeignKey("carpet_id", "carpets(id)", "RESTRICT", "RESTRICT")
+	db.Model(&models.CarpetMedia{}).AddForeignKey("carpet_color_id", "carpet_colors(id)", "RESTRICT", "RESTRICT")
+	db.Model(&models.CarpetMedia{}).AddForeignKey("carpet_id", "carpets(id)", "RESTRICT", "RESTRICT")
 
 	// Use the db instance to interact with the database in your application
 	return db
