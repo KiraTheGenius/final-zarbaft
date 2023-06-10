@@ -21,6 +21,22 @@ type loginReq struct {
 	Password string `json:"password"`
 }
 
+func (u *UserController) Slider(c echo.Context) error {
+
+	locale := c.Param("locale")
+	if locale != "fa" && locale != "en" {
+		return c.String(http.StatusInternalServerError, "locale not supported")
+	}
+	tag := c.Param("tag")
+	if tag != "newest" && tag != "mostـpopular" && tag != "best_selling" {
+		return c.String(http.StatusInternalServerError, "tag not supported")
+	}
+	result, _ := u.UserService.GetSlider(locale, tag)
+
+	return c.JSON(http.StatusOK, result)
+
+}
+
 func (u *UserController) Signup(c echo.Context) error {
 	signupReq := &loginReq{}
 	c.Bind(&signupReq)

@@ -6,6 +6,6 @@ type CarpetColor struct {
 	NameFa    string `json:"color_name_fa"`
 	NameEn    string `json:"color_name_en"`
 	Default   bool   `json:"default"`
-	CarpetID  int64  `gorm:"not null" json:"id_carpet"`
+	CarpetID  int64  `gorm:"not null" json:"carpet_id"`
 	Carpet    Carpet `gorm:"foreignKey:CarpetID"`
 }

@@ -1,9 +1,9 @@
 package models
 
-import "time"
+import "gorm.io/gorm"
 
 type Carpet struct {
-	ID           int64      `gorm:"primaryKey;autoIncrement" json:"id"`
+	gorm.Model
 	NameFa       string     `gorm:"not null" db:"namefa" json:"nameFa"`
 	NameEn       string     `gorm:"not null" db:"namefa" json:"nameEn"`
 	Shane        float64    `gorm:"not null" db:"shane" json:"shane"`
@@ -14,5 +14,6 @@ type Carpet struct {
 	CollectionID int64      `gorm:"not null"`
 	Collection   Collection `gorm:"foreignkey:CollectionID;references:ID"`
 	Slug         string     `gorm:"not null" db:"slug" json:"slug"`
-	CreatedAt    time.Time  `gorm:"default:CURRENT_TIMESTAMP()"`
+	MostPopular  float64    `gorm:"not null"`
+	BestSelling  float64    `gorm:"not null"`
 }
