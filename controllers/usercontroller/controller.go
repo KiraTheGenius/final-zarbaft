@@ -37,6 +37,23 @@ func (u *UserController) Slider(c echo.Context) error {
 
 }
 
+func (u *UserController) GetCollection(c echo.Context) error {
+
+	locale := c.Param("locale")
+	slug := c.Param("slug")
+
+	if locale != "fa" && locale != "en" {
+		return c.String(http.StatusInternalServerError, "locale not supported")
+	}
+	result, err := u.UserService.GetCollection(locale, slug)
+	if err != nil {
+		return c.String(http.StatusNotFound, "Collection Not Found")
+
+	}
+	return c.JSON(http.StatusOK, result)
+
+}
+
 func (u *UserController) Signup(c echo.Context) error {
 	signupReq := &loginReq{}
 	c.Bind(&signupReq)

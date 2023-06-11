@@ -11,6 +11,7 @@ type UserService interface {
 	GetUser(username string) (*models.User, error)
 	DeleteUser(username string) error
 	GetSlider(locale string, tag string) ([]map[string]interface{}, error)
+	GetCollection(locale string, slug string) (*models.Collection, error)
 }
 
 func NewUserService(userRepo userRepository.UserRepository) UserService {
@@ -38,6 +39,10 @@ func (s *userService) GetUser(username string) (*models.User, error) {
 
 func (s *userService) GetSlider(locale string, tag string) ([]map[string]interface{}, error) {
 	return s.userRepository.GetSlider(locale, tag)
+}
+
+func (s *userService) GetCollection(locale string, slug string) (*models.Collection, error) {
+	return s.userRepository.GetCollection(locale, slug)
 }
 
 func (s *userService) DeleteUser(username string) error {

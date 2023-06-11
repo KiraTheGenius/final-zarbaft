@@ -9,5 +9,6 @@ type Collection struct {
 	Slug       string `gorm:"not null" json:"slug"`
 	Background string `gorm:"not null" json:"pic1"` // Images for Background (1)
 	Collection string `gorm:"not null" json:"pic2"` // Images for Collection (2)
+	Carpets    []Carpet
 	// Images for Background and Collection (2)
 }

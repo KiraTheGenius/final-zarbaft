@@ -15,6 +15,7 @@ type UserRepository interface {
 	GetUserByUserId(userId uint) (*models.User, error)
 	DeleteUser(user *models.User) error
 	GetSlider(locale string, tag string) ([]map[string]interface{}, error)
+	GetCollection(locale string, slug string) (*models.Collection, error)
 }
 
 type userGormRepository struct {
@@ -69,6 +70,21 @@ func (ur *userGormRepository) GetSlider(locale string, tag string) ([]map[string
 		Where("carpet_media.feature", "main").Limit(8).Scan(&results)
 
 	return results, nil
+}
+
+func (ur *userGormRepository) GetCollection(locale string, slug string) (*models.Collection, error) {
+	var carpet models.Collection
+
+	result := ur.db.Where("slug = ?", slug).Preload("Carpets", func(db *gorm.DB) *gorm.DB {
+		return db.Select("CollectionID", "name_fa")
+	}).First(&carpet)
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		return nil, fmt.Errorf("not found")
+	}
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &carpet, nil
 }
 
 func (ur *userGormRepository) DeleteUser(user *models.User) error {

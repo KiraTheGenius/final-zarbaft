@@ -36,6 +36,8 @@ func routing(e *echo.Echo) {
 	e.POST("/login", UserController.Login)
 	e.POST("/token", UserController.GetToken)
 	e.GET("/:locale/slider/:tag", UserController.Slider)
+	e.GET("/:locale/collection/:slug", UserController.GetCollection)
+
 	// protected routing
 	e.GET("/now", UserController.GetTime, middlewares.IsLoggedIn, middlewares.IsAdmin)
 }
