@@ -4,6 +4,9 @@ import (
 	"bankai/models"
 	"bankai/repository/userRepository"
 	"bankai/utils"
+	"encoding/json"
+
+	jsoniter "github.com/json-iterator/go"
 )
 
 type UserService interface {
@@ -11,7 +14,7 @@ type UserService interface {
 	GetUser(username string) (*models.User, error)
 	DeleteUser(username string) error
 	GetSlider(locale string, tag string) ([]map[string]interface{}, error)
-	GetCollection(locale string, slug string) (*models.Collection, error)
+	GetCollection(locale string, slug string) (*map[string]interface{}, error)
 }
 
 func NewUserService(userRepo userRepository.UserRepository) UserService {
@@ -41,10 +44,23 @@ func (s *userService) GetSlider(locale string, tag string) ([]map[string]interfa
 	return s.userRepository.GetSlider(locale, tag)
 }
 
-func (s *userService) GetCollection(locale string, slug string) (*models.Collection, error) {
-	return s.userRepository.GetCollection(locale, slug)
-}
+func (s *userService) GetCollection(locale string, slug string) (*map[string]interface{}, error) {
+	collection, _ := s.userRepository.GetCollection(locale, slug)
+	faResult := jsoniter.Config{TagKey: "fa"}.Froze()
 
+	switch locale {
+	case "fa":
+		faResult = jsoniter.Config{TagKey: "fa"}.Froze()
+	case "en":
+		faResult = jsoniter.Config{TagKey: "en"}.Froze()
+	}
+
+	tmpResult, _ := faResult.Marshal(collection)
+	var resultApi map[string]interface{}
+	json.Unmarshal([]byte(tmpResult), &resultApi)
+
+	return &resultApi, nil
+}
 func (s *userService) DeleteUser(username string) error {
 	return nil
 }

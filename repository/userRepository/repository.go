@@ -44,25 +44,16 @@ func (ur *userGormRepository) GetUserByUsername(username string) (*models.User, 
 func (ur *userGormRepository) GetSlider(locale string, tag string) ([]map[string]interface{}, error) {
 	var carpet models.Carpet
 	results := []map[string]interface{}{}
-	selectQuery, orderQuery := "", ""
-	switch locale {
-	case "fa":
-		selectQuery = "carpets.name_fa as name, carpets.slug , collections.name_fa as collection_name , carpet_media.image "
-	case "en":
-		selectQuery = "carpets.name_en as name, carpets.slug , collections.name_en as collection_name , carpet_media.image "
-	}
 
-	switch tag {
-	case "newest":
-		orderQuery = "carpets.created_at desc"
-	case "mostـpopular":
-		orderQuery = "carpets.most_popular desc"
-	case "best_selling":
-		orderQuery = "carpets.best_selling desc"
+	selectQuery := map[string]string{
+		"fa": "carpets.name_fa as name, carpets.slug , collections.name_fa as collection_name , carpet_media.image",
+		"en": "carpets.name_en as name, carpets.slug , collections.name_en as collection_name , carpet_media.image "}
+	orderQuery := map[string]string{
+		"newest":       "carpets.created_at desc",
+		"mostـpopular": "carpets.most_popular desc",
+		"best_selling": "carpets.best_selling desc"}
 
-	}
-
-	ur.db.Model(&carpet).Select(selectQuery).Order(orderQuery).
+	ur.db.Model(&carpet).Select(selectQuery[locale]).Order(orderQuery[tag]).
 		Joins("join collections on collections.id = carpets.collection_id").
 		Joins("join carpet_colors on carpet_colors.carpet_id = carpets.id").
 		Joins("join carpet_media on carpet_media.carpet_color_id = carpet_colors.id").
@@ -74,10 +65,24 @@ func (ur *userGormRepository) GetSlider(locale string, tag string) ([]map[string
 
 func (ur *userGormRepository) GetCollection(locale string, slug string) (*models.Collection, error) {
 	var carpet models.Collection
-
-	result := ur.db.Where("slug = ?", slug).Preload("Carpets", func(db *gorm.DB) *gorm.DB {
-		return db.Select("CollectionID", "name_fa")
-	}).First(&carpet)
+	name := map[string]string{
+		"fa": "name_fa",
+		"en": "name_en "}
+	motto := map[string]string{
+		"fa": "motto_fa",
+		"en": "motto_en "}
+	result := ur.db.Select("ID", name[locale], motto[locale], "slug", "background", "collection").
+		Where("slug = ?", slug).
+		Preload("Carpets", func(db *gorm.DB) *gorm.DB {
+			return db.Select("ID", "collection_id", name[locale], "code_naqshe")
+		}).
+		Preload("Carpets.CarpetColors", func(db *gorm.DB) *gorm.DB {
+			return db.Select("ID", name[locale], "default", "carpet_id").Where("default", "1")
+		}).
+		Preload("Carpets.CarpetColors.CarpetMedias", func(db *gorm.DB) *gorm.DB {
+			return db.Select("ID", "image", "carpet_color_id", "feature").Where("feature", "main").Or("feature", "background")
+		}).
+		First(&carpet)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return nil, fmt.Errorf("not found")
 	}

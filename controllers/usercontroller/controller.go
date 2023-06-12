@@ -50,6 +50,7 @@ func (u *UserController) GetCollection(c echo.Context) error {
 		return c.String(http.StatusNotFound, "Collection Not Found")
 
 	}
+
 	return c.JSON(http.StatusOK, result)
 
 }
