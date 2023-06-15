@@ -45,7 +45,7 @@ func (s *userService) GetSlider(locale string, tag string) ([]map[string]interfa
 }
 
 func (s *userService) GetCollection(locale string, slug string) (*map[string]interface{}, error) {
-	collection, _ := s.userRepository.GetCollection(locale, slug)
+	collection, err := s.userRepository.GetCollection(locale, slug)
 	faResult := jsoniter.Config{TagKey: "fa"}.Froze()
 
 	switch locale {
@@ -59,7 +59,7 @@ func (s *userService) GetCollection(locale string, slug string) (*map[string]int
 	var resultApi map[string]interface{}
 	json.Unmarshal([]byte(tmpResult), &resultApi)
 
-	return &resultApi, nil
+	return &resultApi, err
 }
 func (s *userService) DeleteUser(username string) error {
 	return nil

@@ -2,6 +2,7 @@ package userRepository
 
 import (
 	"bankai/models"
+	"bankai/utils"
 	"errors"
 	"fmt"
 
@@ -111,7 +112,7 @@ func (ur *userGormRepository) GetUserByUserId(userId uint) (*models.User, error)
 func getDbConnection() *gorm.DB {
 	//user:password@/dbname?charset=utf8&parseTime=True&loc=Local")
 
-	dbURI := "admin:13771377Ab?@tcp(localhost:3306)/zarbaft?charset=utf8&parseTime=True&loc=Local"
+	dbURI := fmt.Sprintf("%s:%s@tcp(localhost:%s)/%s?charset=utf8&parseTime=True&loc=Local", utils.ENV("DB_USERNAME"), utils.ENV("DB_PASSWORD"), utils.ENV("DB_PORT"), utils.ENV("DB_DATABASE"))
 	// Connect to the database
 
 	db, err := gorm.Open(mysql.Open(dbURI), &gorm.Config{})
